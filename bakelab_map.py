@@ -73,6 +73,7 @@ class BakeLabMap(PropertyGroup):
 
     
     float_depth: BoolProperty(name = '32 bit float', default = False)
+    use_exist_image: BoolProperty(name = 'Use Exist Image', default = False)
     color_space : EnumProperty(
                 name = 'Color Space',
                 description = 'Color Space',

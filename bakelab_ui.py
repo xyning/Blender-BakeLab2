@@ -167,7 +167,7 @@ class BakeLabUI(Panel):
                         text = ''
                     )
                     col.prop(item, 'color_space')
-                    col.prop(item, "deep_search")
+                col.prop(item, "deep_search")
                 
                 if item.type == 'Displacement':
                     if not item.float_depth:
@@ -192,6 +192,7 @@ class BakeLabUI(Panel):
                 
                 col.separator()
                 col.prop(item, "float_depth")
+                col.prop(item, "use_exist_image")
                 if props.save_or_pack == 'SAVE':
                     row = col.row()
                     row.prop(item, "file_format")

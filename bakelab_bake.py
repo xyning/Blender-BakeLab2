@@ -428,11 +428,17 @@ class Baker(Operator):
         map.final_aa = props.anti_alias
         if map.aa_override > 0:
             map.final_aa = map.aa_override
-        bake_image = bpy.data.images.new(
-            name = map.img_name.replace('*', name),
-            width  = map.target_width  * map.final_aa, 
-            height = map.target_height * map.final_aa
-        )
+
+        map_name = map.img_name.replace('*', name)
+        reuse_exist_image = bpy.data.images.find(map_name) >= 0 and map.use_exist_image
+        if reuse_exist_image:
+            bake_image = bpy.data.images[map_name]
+        else:
+            bake_image = bpy.data.images.new(
+                name=map_name,
+                width=map.target_width * map.final_aa,
+                height=map.target_height * map.final_aa
+            )
         bake_image.use_generated_float = map.float_depth
         try:
             bake_image.colorspace_settings.name = map.color_space
@@ -446,30 +452,32 @@ class Baker(Operator):
                 self.report(type = {'WARNING'}, message = "Couldn't change color space of image")
         
         context.scene.render.bake.margin = props.bake_margin * map.final_aa
-        if props.save_or_pack == 'PACK':
-            bake_image.pack()
-        else:
-            extension = "."
-            if map.file_format == 'PNG':
-                extension = '.png'
-            if map.file_format == 'JPEG':
-                extension = '.jpg'
-            if map.file_format == 'OPEN_EXR':
-                extension = '.exr'
-            
-            abs_save_path = bpy.path.abspath(props.save_path)
-            if not os.path.isdir(abs_save_path):
-                os.makedirs(abs_save_path, 0o777)
-            
-            if props.create_folder:
-                if props.bake_mode == "ALL_TO_ONE":
-                    bake_image.filepath = abspath(join(abs_save_path, props.folder_name, bake_image.name + extension))
-                else:
-                    bake_image.filepath = abspath(join(abs_save_path, name, bake_image.name + extension))
+
+        if not reuse_exist_image:
+            if props.save_or_pack == 'PACK':
+                bake_image.pack()
             else:
-                bake_image.filepath = abspath(join(abs_save_path, bake_image.name + extension))
-            
-            bake_image.save_render(bake_image.filepath)
+                extension = "."
+                if map.file_format == 'PNG':
+                    extension = '.png'
+                if map.file_format == 'JPEG':
+                    extension = '.jpg'
+                if map.file_format == 'OPEN_EXR':
+                    extension = '.exr'
+                
+                abs_save_path = bpy.path.abspath(props.save_path)
+                if not os.path.isdir(abs_save_path):
+                    os.makedirs(abs_save_path, 0o777)
+                
+                if props.create_folder:
+                    if props.bake_mode == "ALL_TO_ONE":
+                        bake_image.filepath = abspath(join(abs_save_path, props.folder_name, bake_image.name + extension))
+                    else:
+                        bake_image.filepath = abspath(join(abs_save_path, name, bake_image.name + extension))
+                else:
+                    bake_image.filepath = abspath(join(abs_save_path, bake_image.name + extension))
+                
+                bake_image.save_render(bake_image.filepath)
         
         return bake_image
     
@@ -537,7 +545,8 @@ class Baker(Operator):
                         self.ungroup_nodes(mat.node_tree)
                     self.passes_to_emit_node(mat, map.pass_name)
                 if map.type == 'Albedo':
-                    self.ungroup_nodes(mat.node_tree)
+                    if map.deep_search:
+                        self.ungroup_nodes(mat.node_tree)
                     self.passes_to_emit_node(mat, 'Albedo,Color,Base Color,Col,Paint Color')
                 if map.type == 'Displacement':
                     self.displacement_to_color(mat)
