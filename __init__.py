@@ -88,6 +88,10 @@ class BakeLabProperties(PropertyGroup):
             name = 'Cage Extrusion', default = 0.05,
             min = 0, soft_max = 1
         )
+    cage_object : PointerProperty(
+            name = 'Cage Object',
+            type = bpy.types.Object
+        )
     pre_join_mesh : BoolProperty(
             name = 'Pre-Join Meshes', default = False,
             description = 'Create one merged mesh and bake to it using ray-tracing',

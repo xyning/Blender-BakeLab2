@@ -39,6 +39,7 @@ class BakeLabUI(Panel):
                 col.use_property_decorate = False
                 col.prop(props, "bake_margin")
                 if props.bake_mode == "TO_ACTIVE":
+                    col.prop(props, "cage_object")
                     col.prop(props, "cage_extrusion")
                 if props.bake_mode == "ALL_TO_ONE":
                     col.prop(props, "global_image_name")

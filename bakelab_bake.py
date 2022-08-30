@@ -636,7 +636,7 @@ class Baker(Operator):
         scene.cycles.preview_pause = True
         scene.render.bake.use_cage = True
         scene.render.bake.cage_extrusion = props.cage_extrusion
-        scene.render.bake.cage_object = None
+        scene.render.bake.cage_object = props.cage_object
         
         
         if len(self.default_selected_objects) == 0:
@@ -813,6 +813,7 @@ class Baker(Operator):
             render.bake.use_selected_to_active = True
             render.bake.use_cage = True
             render.bake.cage_extrusion = props.cage_extrusion
+            render.bake.cage_object = props.cage_object
             
              # Save baking data {
             baked_data = scene.BakeLab_Data.add()
